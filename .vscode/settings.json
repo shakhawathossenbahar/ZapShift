@@ -1,0 +1,17 @@
+{
+  "windowColor.mainColor": "#7c4b71",
+  "window.title": "c:\\Code Playground\\Programming Hero\\Demo Projects\\ZapShift",
+  "workbench.colorCustomizations": {
+    "titleBar.activeBackground": "#7c4b71",
+    "titleBar.activeForeground": "#ffffff",
+    "titleBar.inactiveBackground": "#7c4b71",
+    "titleBar.inactiveForeground": "#ffffff90"
+  },
+  "windowColor.name": "c:\\Code Playground\\Programming Hero\\Demo Projects\\ZapShift",
+  "windowColor.isActivityBarColored": false,
+  "windowColor.isTitleBarColored": true,
+  "windowColor.isStatusBarColored": false,
+  "windowColor.isWindowNameColored": false,
+  "windowColor.isActiveItemsColored": false,
+  "windowColor.setWindowTitle": true
+}
