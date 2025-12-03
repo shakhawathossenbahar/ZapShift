@@ -33,10 +33,20 @@ async function run() {
     const db = client.db("zap_shift_db");
     const parcelsCollection = db.collection("parcels");
 
-    // parcel API
+
+    // parcels APIs
 
     app.get('/parcels', async (req, res) => {
+      const query = {};
+      const { email } = req.query;
 
+      if(email){
+        query.senderEmail = email;
+      }
+
+      const cursor = parcelsCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
     });
 
     app.post('/parcels', async (req, res) => {

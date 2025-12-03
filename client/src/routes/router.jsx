@@ -10,6 +10,7 @@ import PrivateRoute from "./PrivateRoute";
 import Rider from "../pages/Rider/Rider";
 import SendParcel from "../pages/SendParcel/SendParcel";
 import Loader from "../components/Loader/Loader";
+import DashboardLayout from "../layouts/DashboardLayout";
 
 export const router = createBrowserRouter([
   {
@@ -50,7 +51,7 @@ export const router = createBrowserRouter([
             <SendParcel></SendParcel>
           </PrivateRoute>
         ),
-        loader: () => fetch("warehouses.json")
+        loader: () => fetch("warehouses.json"),
         // loader: async () => {
         //   await new Promise((res) => setTimeout(res, 1000));
         //   return fetch("warehouse.json");
@@ -74,5 +75,14 @@ export const router = createBrowserRouter([
         Component: Login,
       },
     ],
+  },
+
+  {
+    path: "/dashboard",
+    element: (
+      <PrivateRoute>
+        <DashboardLayout></DashboardLayout>
+      </PrivateRoute>
+    ),
   },
 ]);

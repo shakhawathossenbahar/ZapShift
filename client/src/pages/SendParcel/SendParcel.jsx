@@ -3,6 +3,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { useLoaderData } from "react-router";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
+import useAuth from "../../hooks/useAuth";
 
 export default function SendParcel() {
   // Using react hook form
@@ -13,6 +14,8 @@ export default function SendParcel() {
     formState: { errors },
   } = useForm();
 
+  const { user } = useAuth();
+
   const axiosSecure = useAxiosSecure();
 
   // getting data from the loader
@@ -21,7 +24,7 @@ export default function SendParcel() {
   // finding divisions name from the whole list
   const divisionsDuplicate = warehouses.map((warehouse) => warehouse.region);
 
-  // making an arrya of the divisions name
+  // making an array of the divisions name
   const divisions = [...new Set(divisionsDuplicate)];
 
   // making this watch for sender
@@ -68,7 +71,7 @@ export default function SendParcel() {
 
     Swal.fire({
       title: "Agree with the cost?",
-      text: "You have to pay!",
+      text: `You have to pay ${cost} taka`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -79,7 +82,10 @@ export default function SendParcel() {
 
         // save the parcel data into the database
 
-        
+        axiosSecure.post('/parcels', data)
+        .then(res => {
+          console.log("After saving data", res.data)
+        })
 
 
 
@@ -188,6 +194,8 @@ export default function SendParcel() {
                   <label className="field-label">Sender Name</label>
                   <input
                     {...register("senderName")}
+                    defaultValue={user?.displayName}
+                    readOnly
                     placeholder="Sender Name"
                     className="input-field"
                   />
@@ -197,6 +205,8 @@ export default function SendParcel() {
                   <label className="field-label">Sender Email</label>
                   <input
                     {...register("senderEmail")}
+                    defaultValue={user?.email}
+                    readOnly
                     placeholder="Sender Email"
                     className="input-field"
                   />
