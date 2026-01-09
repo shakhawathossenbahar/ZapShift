@@ -68,6 +68,9 @@ export default function SendParcel() {
     }
 
     console.log("cost", cost);
+    
+    // add cost to the database
+    data.deliveryCharge = cost;
 
     Swal.fire({
       title: "Agree with the cost?",
@@ -79,15 +82,11 @@ export default function SendParcel() {
       confirmButtonText: "Yes, I agree!",
     }).then((result) => {
       if (result.isConfirmed) {
-
         // save the parcel data into the database
 
-        axiosSecure.post('/parcels', data)
-        .then(res => {
-          console.log("After saving data", res.data)
-        })
-
-
+        axiosSecure.post("/parcels", data).then((res) => {
+          console.log("After saving data", res.data);
+        });
 
         // Swal.fire({
         //   title: "Successful!",

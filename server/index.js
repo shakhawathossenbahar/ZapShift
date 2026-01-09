@@ -3,14 +3,16 @@ const cors = require('cors');
 const app = express();
 require('dotenv').config();
 const port = 3000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+
+// STRIPE 
+const stripe = require('stripe')(process.env.STIPE_SECRET);
+
+
 
 // middleware
 app.use(express.json());
 app.use(cors());
-
-
-
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@shb.iagrir9.mongodb.net/?appName=SHB`;
@@ -40,20 +42,83 @@ async function run() {
       const query = {};
       const { email } = req.query;
 
-      if(email){
+      if (email) {
         query.senderEmail = email;
       }
 
-      const cursor = parcelsCollection.find(query);
+      const options = { sort: { "createdAt": -1 } }
+
+      const cursor = parcelsCollection.find(query, options);
       const result = await cursor.toArray();
       res.send(result);
     });
 
+
+    app.get('/parcels/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await parcelsCollection.findOne(query);
+      res.send(result);
+    });
+
+
+
     app.post('/parcels', async (req, res) => {
       const parcel = req.body;
+
+      // parcel created time
+      parcel.createdAt = new Date();
+
       const result = await parcelsCollection.insertOne(parcel);
       res.send(result);
-    })
+    });
+
+
+
+    app.delete('/parcels/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await parcelsCollection.deleteOne(query);
+      res.send(result);
+    });
+
+
+
+    // PAYMENT RELATED API
+
+    app.post('/create-checkout-session', async (req, res) => {
+      const paymentInfo = req.body;
+
+      const amount = parseInt(paymentInfo.deliveryCharge) * 100;
+
+
+      const session = await stripe.checkout.sessions.create({
+        line_items: [
+          {
+            price_data: {
+              currency: 'USD',
+              unit_amount: amount,
+              product_data: {
+                name: paymentInfo.parcelName,
+              },
+            },
+            quantity: 1,
+          },
+        ],
+
+        customer_email: paymentInfo.senderEmail,
+        mode: 'payment',
+        metadata: {
+          parcelId: paymentInfo.pareclId,
+        },
+
+        success_url: `${process.env.SITE_DOMAIN}/dashboard/payment-success`,
+
+        cancel_url: `${process.env.SITE_DOMAIN}/dashboard/payment-cancelled`,
+      });
+
+      res.send({ url: session.url });
+    });
 
 
 
